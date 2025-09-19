@@ -7,7 +7,7 @@ steps:
   
   - name: 'gcr.io/cloud-builders/gcloud'
     args: [
-      'run', 'deploy', 'maf-policy-bot-tf',
+      'run', 'deploy', 'maf-policy-bot-7d1bbb0e',
       '--image=gcr.io/$PROJECT_ID/maf-policy-bot:latest',
       '--region=us-central1',
       '--allow-unauthenticated',
