@@ -51,9 +51,8 @@ jobs:
         echo '  }' >> backend_override.tf
         echo '}' >> backend_override.tf
         terraform init
-        # Force unlock any existing locks
-        terraform force-unlock -force 1758300824724783 || true
-        terraform force-unlock -force 1758301219093997 || true
+        # Clear any lock files
+        rm -f .terraform.lock.hcl || true
       working-directory: ./terraform
 
     - name: Terraform Plan (Create)
