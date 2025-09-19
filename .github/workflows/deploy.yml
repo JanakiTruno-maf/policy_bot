@@ -75,39 +75,21 @@ jobs:
           --set-env-vars="GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},VERTEX_LOCATION=${{ env.REGION }},VERTEX_MODEL_NAME=gemini-2.0-flash-001,RAG_CORPUS_RESOURCE=projects/${{ env.PROJECT_ID }}/locations/us-east4/ragCorpora/4035225266123964416,SECRET_KEY=tobacco-legal-info-system-2024,GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }},GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
         # Update state to reflect deployment
         SERVICE_URL="https://${{ env.SERVICE_NAME }}-670869581400.${{ env.REGION }}.run.app"
-        cat > deployment_state.json << EOF
-{
-  "version": 4,
-  "terraform_version": "1.5.0",
-  "serial": $(date +%s),
-  "lineage": "gcloud-managed",
-  "outputs": {
-    "service_url": {
-      "value": "$SERVICE_URL",
-      "type": "string"
-    },
-    "deployment_method": {
-      "value": "gcloud-builds",
-      "type": "string"
-    }
-  },
-  "resources": [
-    {
-      "mode": "managed",
-      "type": "google_cloud_run_v2_service",
-      "name": "${{ env.SERVICE_NAME }}",
-      "instances": [{
-        "attributes": {
-          "name": "${{ env.SERVICE_NAME }}",
-          "location": "${{ env.REGION }}",
-          "uri": "$SERVICE_URL",
-          "deployed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-        }
-      }]
-    }
-  ]
-}
-EOF
+        TIMESTAMP=$(date +%s)
+        DEPLOY_TIME=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+        echo '{' > deployment_state.json
+        echo '  "version": 4,' >> deployment_state.json
+        echo '  "terraform_version": "1.5.0",' >> deployment_state.json
+        echo '  "serial": '$TIMESTAMP',' >> deployment_state.json
+        echo '  "lineage": "gcloud-managed",' >> deployment_state.json
+        echo '  "outputs": {' >> deployment_state.json
+        echo '    "service_url": {' >> deployment_state.json
+        echo '      "value": "'$SERVICE_URL'",' >> deployment_state.json
+        echo '      "type": "string"' >> deployment_state.json
+        echo '    }' >> deployment_state.json
+        echo '  },' >> deployment_state.json
+        echo '  "resources": []' >> deployment_state.json
+        echo '}' >> deployment_state.json
         gsutil cp deployment_state.json gs://${{ env.PROJECT_ID }}-maf-policy-bot-terraform-state/terraform/state/default.tfstate
         rm deployment_state.json
         echo "✅ Deployment completed successfully!"
