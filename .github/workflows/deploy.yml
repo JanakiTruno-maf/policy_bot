@@ -69,14 +69,12 @@ jobs:
           -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}"
         echo "Migrating state to GCS bucket..."
         # Enable backend configuration
-        cat > backend_override.tf << EOF
-terraform {
-  backend "gcs" {
-    bucket = "bat-bigquery-maf-policy-bot-terraform-state"
-    prefix = "terraform/state"
-  }
-}
-EOF
+        echo 'terraform {' > backend_override.tf
+        echo '  backend "gcs" {' >> backend_override.tf
+        echo '    bucket = "bat-bigquery-maf-policy-bot-terraform-state"' >> backend_override.tf
+        echo '    prefix = "terraform/state"' >> backend_override.tf
+        echo '  }' >> backend_override.tf
+        echo '}' >> backend_override.tf
         terraform init -migrate-state -force-copy
       working-directory: ./terraform
 
