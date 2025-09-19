@@ -44,7 +44,7 @@ resource "google_storage_bucket" "terraform_state" {
 
 # Simple Cloud Run service deployment
 resource "google_cloud_run_v2_service" "default" {
-  name     = var.service_name
+  name     = "${var.service_name}-${random_id.bucket_suffix.hex}"
   location = var.region
 
   template {
