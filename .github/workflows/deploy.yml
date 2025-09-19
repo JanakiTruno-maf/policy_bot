@@ -63,6 +63,8 @@ jobs:
     - name: Terraform Apply (Create)
       if: github.event.inputs.action == 'create'
       run: |
+        # Import existing service to avoid conflicts
+        terraform import -lock=false google_cloud_run_v2_service.default projects/${{ env.PROJECT_ID }}/locations/${{ env.REGION }}/services/${{ env.SERVICE_NAME }} || true
         terraform apply -auto-approve -lock=false \
           -var="project_id=${{ env.PROJECT_ID }}" \
           -var="region=${{ env.REGION }}" \
