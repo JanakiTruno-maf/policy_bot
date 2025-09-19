@@ -42,7 +42,15 @@ jobs:
         terraform_version: 1.5.0
 
     - name: Terraform Init
-      run: terraform init
+      run: |
+        # Check if backend is configured
+        if [ -f "backend_override.tf" ]; then
+          echo "Using GCS backend"
+          terraform init
+        else
+          echo "Using local backend for first run"
+          terraform init
+        fi
       working-directory: ./terraform
 
     - name: Terraform Plan (Create)
@@ -60,11 +68,15 @@ jobs:
           -var="google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
           -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}"
         echo "Migrating state to GCS bucket..."
-        sed -i 's/# terraform {/terraform {/' backend.tf
-        sed -i 's/#   backend/  backend/' backend.tf
-        sed -i 's/#     bucket/    bucket/' backend.tf
-        sed -i 's/#     prefix/    prefix/' backend.tf
-        sed -i 's/# }/}/' backend.tf
+        # Enable backend configuration
+        cat > backend_override.tf << EOF
+terraform {
+  backend "gcs" {
+    bucket = "bat-bigquery-maf-policy-bot-terraform-state"
+    prefix = "terraform/state"
+  }
+}
+EOF
         terraform init -migrate-state -force-copy
       working-directory: ./terraform
 
