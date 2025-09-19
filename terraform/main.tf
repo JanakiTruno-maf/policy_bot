@@ -48,8 +48,19 @@ resource "google_cloud_run_v2_service" "default" {
   location = var.region
 
   template {
+    timeout = "300s"
     containers {
       image = "us-central1-docker.pkg.dev/${var.project_id}/maf-policy-bot/app:latest"
+      
+      startup_probe {
+        initial_delay_seconds = 0
+        timeout_seconds = 1
+        period_seconds = 3
+        failure_threshold = 1
+        tcp_socket {
+          port = 8080
+        }
+      }
       
       ports {
         container_port = 8080

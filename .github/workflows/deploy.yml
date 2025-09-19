@@ -68,7 +68,8 @@ jobs:
           -var="region=${{ env.REGION }}" \
           -var="service_name=${{ env.SERVICE_NAME }}" \
           -var="google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
-          -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}"
+          -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+          -parallelism=10
       working-directory: ./terraform
 
     - name: Terraform Destroy
