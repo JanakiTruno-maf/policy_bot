@@ -1,0 +1,32 @@
+stages:
+  - deploy
+
+variables:
+  PROJECT_ID: $GCP_PROJECT_ID
+  REGION: us-central1
+  SERVICE_NAME: maf-policy-bot
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk:alpine
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "web"
+  before_script:
+    - echo $GCP_SA_KEY | base64 -d > gcp-key.json
+    - gcloud auth activate-service-account --key-file gcp-key.json
+    - gcloud config set project $PROJECT_ID
+    - gcloud auth configure-docker $REGION-docker.pkg.dev
+    - apk add --no-cache curl unzip
+    - curl -LO https://releases.hashicorp.com/terraform/1.5.0/terraform_1.5.0_linux_amd64.zip
+    - unzip terraform_1.5.0_linux_amd64.zip
+    - mv terraform /usr/local/bin/
+  script:
+    - cd terraform
+    - terraform init
+    - |
+      if [ "$ACTION" = "destroy" ]; then
+        terraform destroy -auto-approve -var="project_id=$PROJECT_ID" -var="region=$REGION" -var="service_name=$SERVICE_NAME"
+      else
+        terraform plan -var="project_id=$PROJECT_ID" -var="region=$REGION" -var="service_name=$SERVICE_NAME"
+        terraform apply -auto-approve -var="project_id=$PROJECT_ID" -var="region=$REGION" -var="service_name=$SERVICE_NAME"
+      fi

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MAF Policy Bot</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>MAF POLICY BOT</h1>
+      <div class="header-actions">
+        {% if user %}
+          <div class="user-info">
+            <img src="{{ user.picture }}" alt="{{ user.name }}" class="user-avatar">
+            <span>{{ user.name }}</span>
+            <a href="/logout" class="logout-btn">Logout</a>
+          </div>
+        {% endif %}
+        <button id="clear-btn" class="clear-btn">Clear</button>
+      </div>
+    </header>
+
+    <main>
+      <div class="chat-container">
+        <div id="conversation" class="conversation">
+          <div class="welcome-message">
+            <h3>Welcome to MAF Policy Bot</h3>
+            <p>I provide factual information about tobacco laws, regulations, and legal requirements from our document database. Ask me about tobacco legislation, compliance requirements, or market regulations.</p>
+          </div>
+        </div>
+        
+        <form id="chat-form" class="input-form">
+          <div class="input-group">
+            <input type="text" id="message" placeholder="Ask about tobacco laws and regulations..." />
+          </div>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
