@@ -3,7 +3,7 @@
 
 # terraform {
 #   backend "gcs" {
-#     bucket = "bat-bigquery-terraform-state"
+#     bucket = "bat-bigquery-maf-policy-bot-terraform-state"
 #     prefix = "terraform/state"
 #   }
 # }

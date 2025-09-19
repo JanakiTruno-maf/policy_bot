@@ -5,10 +5,6 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
-    random = {
-      source  = "hashicorp/random"
-      version = "~> 3.1"
-    }
   }
 }
 
@@ -17,14 +13,11 @@ provider "google" {
   region  = var.region
 }
 
-# Random suffix for unique bucket name
-resource "random_id" "bucket_suffix" {
-  byte_length = 4
-}
+# Use fixed names for consistent deployment
 
 # GCS bucket for Terraform state
 resource "google_storage_bucket" "terraform_state" {
-  name          = "${var.project_id}-tf-state-${random_id.bucket_suffix.hex}"
+  name          = "${var.project_id}-maf-policy-bot-terraform-state"
   location      = var.region
   force_destroy = true
 
@@ -47,7 +40,7 @@ resource "google_storage_bucket" "terraform_state" {
 
 # Simple Cloud Run service deployment
 resource "google_cloud_run_v2_service" "default" {
-  name     = "${var.service_name}-${random_id.bucket_suffix.hex}"
+  name     = var.service_name
   location = var.region
 
   template {
