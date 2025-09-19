@@ -53,7 +53,12 @@ jobs:
     - name: Terraform Apply (Create)
       if: github.event.inputs.action == 'create'
       run: |
-        terraform apply -auto-approve -var="project_id=${{ env.PROJECT_ID }}" -var="region=${{ env.REGION }}" -var="service_name=${{ env.SERVICE_NAME }}"
+        terraform apply -auto-approve \
+          -var="project_id=${{ env.PROJECT_ID }}" \
+          -var="region=${{ env.REGION }}" \
+          -var="service_name=${{ env.SERVICE_NAME }}" \
+          -var="google_client_id=${{ secrets.GOOGLE_CLIENT_ID }}" \
+          -var="google_client_secret=${{ secrets.GOOGLE_CLIENT_SECRET }}"
         echo "Migrating state to GCS bucket..."
         sed -i 's/# terraform {/terraform {/' backend.tf
         sed -i 's/#   backend/  backend/' backend.tf

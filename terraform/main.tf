@@ -70,7 +70,27 @@ resource "google_cloud_run_v2_service" "default" {
 
       env {
         name  = "RAG_CORPUS_RESOURCE"
-        value = var.rag_corpus_resource
+        value = "projects/${var.project_id}/locations/us-east4/ragCorpora/4035225266123964416"
+      }
+
+      env {
+        name  = "VERTEX_MODEL_NAME"
+        value = "gemini-2.0-flash-001"
+      }
+
+      env {
+        name  = "SECRET_KEY"
+        value = "tobacco-legal-info-system-2024"
+      }
+
+      env {
+        name  = "GOOGLE_CLIENT_ID"
+        value = var.google_client_id
+      }
+
+      env {
+        name  = "GOOGLE_CLIENT_SECRET"
+        value = var.google_client_secret
       }
 
       resources {
