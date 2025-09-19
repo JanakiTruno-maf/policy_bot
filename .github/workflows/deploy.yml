@@ -63,13 +63,18 @@ jobs:
     - name: Deploy with Cloud Build (Create)
       if: github.event.inputs.action == 'create'
       run: |
-        # Use working gcloud builds submit approach
-        gcloud builds submit --config cloudbuild.yaml --project=${{ env.PROJECT_ID }}
+        # Submit build and wait for completion without streaming logs
+        BUILD_ID=$(gcloud builds submit --config cloudbuild.yaml --project=${{ env.PROJECT_ID }} --format="value(id)" --no-user-output-enabled)
+        echo "Build ID: $BUILD_ID"
+        # Wait for build to complete
+        gcloud builds wait $BUILD_ID --project=${{ env.PROJECT_ID }}
         # Set environment variables
         gcloud run services update ${{ env.SERVICE_NAME }} \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
           --set-env-vars="GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},VERTEX_LOCATION=${{ env.REGION }},VERTEX_MODEL_NAME=gemini-2.0-flash-001,RAG_CORPUS_RESOURCE=projects/${{ env.PROJECT_ID }}/locations/us-east4/ragCorpora/4035225266123964416,SECRET_KEY=tobacco-legal-info-system-2024,GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }},GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        echo "✅ Deployment completed successfully!"
+        echo "🚀 Service URL: https://${{ env.SERVICE_NAME }}-670869581400.${{ env.REGION }}.run.app"
 
     - name: Destroy Service
       if: github.event.inputs.action == 'destroy'
