@@ -42,13 +42,8 @@ resource "google_storage_bucket" "terraform_state" {
   }
 }
 
-# Artifact Registry repository
-resource "google_artifact_registry_repository" "repo" {
-  location      = var.region
-  repository_id = var.service_name
-  description   = "Docker repository for ${var.service_name}"
-  format        = "DOCKER"
-}
+# Note: Artifact Registry repository created manually
+# gcloud artifacts repositories create maf-policy-bot --repository-format=docker --location=us-central1
 
 # Simple Cloud Run service deployment
 resource "google_cloud_run_v2_service" "default" {
