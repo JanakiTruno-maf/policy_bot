@@ -63,8 +63,6 @@ jobs:
     - name: Terraform Apply (Create)
       if: github.event.inputs.action == 'create'
       run: |
-        # Try to import existing bucket if it exists
-        terraform import google_storage_bucket.terraform_state ${{ env.PROJECT_ID }}-maf-policy-bot-terraform-state || true
         terraform apply -auto-approve \
           -var="project_id=${{ env.PROJECT_ID }}" \
           -var="region=${{ env.REGION }}" \
