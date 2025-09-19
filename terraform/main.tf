@@ -6,10 +6,6 @@ terraform {
       version = "~> 5.0"
     }
   }
-  backend "gcs" {
-    bucket = "maf-policy-bot-terraform-state"
-    prefix = "terraform/state"
-  }
 }
 
 provider "google" {
@@ -19,7 +15,7 @@ provider "google" {
 
 # GCS bucket for Terraform state
 resource "google_storage_bucket" "terraform_state" {
-  name          = "maf-policy-bot-terraform-state"
+  name          = "${var.project_id}-terraform-state"
   location      = var.region
   force_destroy = true
 

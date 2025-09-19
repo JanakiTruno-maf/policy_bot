@@ -52,7 +52,15 @@ jobs:
 
     - name: Terraform Apply (Create)
       if: github.event.inputs.action == 'create'
-      run: terraform apply -auto-approve -var="project_id=${{ env.PROJECT_ID }}" -var="region=${{ env.REGION }}" -var="service_name=${{ env.SERVICE_NAME }}"
+      run: |
+        terraform apply -auto-approve -var="project_id=${{ env.PROJECT_ID }}" -var="region=${{ env.REGION }}" -var="service_name=${{ env.SERVICE_NAME }}"
+        echo "Migrating state to GCS bucket..."
+        sed -i 's/# terraform {/terraform {/' backend.tf
+        sed -i 's/#   backend/  backend/' backend.tf
+        sed -i 's/#     bucket/    bucket/' backend.tf
+        sed -i 's/#     prefix/    prefix/' backend.tf
+        sed -i 's/# }/}/' backend.tf
+        terraform init -migrate-state -force-copy
       working-directory: ./terraform
 
     - name: Terraform Destroy
