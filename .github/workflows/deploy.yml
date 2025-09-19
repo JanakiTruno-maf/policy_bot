@@ -61,6 +61,8 @@ jobs:
     - name: Terraform Apply (Create)
       if: github.event.inputs.action == 'create'
       run: |
+        # Try to import existing bucket if it exists
+        terraform import google_storage_bucket.terraform_state ${{ env.PROJECT_ID }}-maf-policy-bot-terraform-state || true
         terraform apply -auto-approve \
           -var="project_id=${{ env.PROJECT_ID }}" \
           -var="region=${{ env.REGION }}" \
@@ -71,7 +73,7 @@ jobs:
         # Enable backend configuration
         echo 'terraform {' > backend_override.tf
         echo '  backend "gcs" {' >> backend_override.tf
-        echo '    bucket = "bat-bigquery-maf-policy-bot-terraform-state"' >> backend_override.tf
+        echo '    bucket = "${{ env.PROJECT_ID }}-maf-policy-bot-terraform-state"' >> backend_override.tf
         echo '    prefix = "terraform/state"' >> backend_override.tf
         echo '  }' >> backend_override.tf
         echo '}' >> backend_override.tf
