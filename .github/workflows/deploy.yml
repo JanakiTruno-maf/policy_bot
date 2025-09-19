@@ -64,7 +64,7 @@ jobs:
     - name: Terraform Apply (Create)
       if: github.event.inputs.action == 'create'
       run: |
-        terraform apply -auto-approve \
+        terraform apply -auto-approve -lock=false \
           -var="project_id=${{ env.PROJECT_ID }}" \
           -var="region=${{ env.REGION }}" \
           -var="service_name=${{ env.SERVICE_NAME }}" \
@@ -76,7 +76,7 @@ jobs:
     - name: Terraform Destroy
       if: github.event.inputs.action == 'destroy'
       run: |
-        terraform destroy -auto-approve \
+        terraform destroy -auto-approve -lock=false \
           -var="project_id=${{ env.PROJECT_ID }}" \
           -var="region=${{ env.REGION }}" \
           -var="service_name=${{ env.SERVICE_NAME }}" \
