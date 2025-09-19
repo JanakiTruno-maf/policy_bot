@@ -79,7 +79,13 @@ jobs:
     - name: Destroy Service
       if: github.event.inputs.action == 'destroy'
       run: |
+        # Delete the Cloud Run service
         gcloud run services delete ${{ env.SERVICE_NAME }} \
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
           --quiet
+        # Clean up Terraform state since we're not using Terraform anymore
+        echo '{"version": 4, "terraform_version": "1.5.0", "serial": 1, "lineage": "clean", "outputs": {}, "resources": []}' > empty_state.json
+        gsutil cp empty_state.json gs://${{ env.PROJECT_ID }}-maf-policy-bot-terraform-state/terraform/state/default.tfstate
+        rm empty_state.json
+        echo "✅ Service deleted and state cleaned!"
