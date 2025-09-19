@@ -13,7 +13,7 @@ gcloud services enable containerregistry.googleapis.com --project=bat-bigquery
 # Add minimal roles to service account
 gcloud projects add-iam-policy-binding bat-bigquery \
   --member="serviceAccount:gemini-chat-bq@bat-bigquery.iam.gserviceaccount.com" \
-  --role="roles/cloudbuild.builds.editor"
+  --role="roles/run.developer"
 
 gcloud projects add-iam-policy-binding bat-bigquery \
   --member="serviceAccount:gemini-chat-bq@bat-bigquery.iam.gserviceaccount.com" \

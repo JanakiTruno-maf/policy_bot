@@ -85,14 +85,6 @@ resource "google_cloud_run_v2_service" "default" {
   }
 }
 
-# Allow unauthenticated access
-resource "google_cloud_run_v2_service_iam_binding" "default" {
-  location = google_cloud_run_v2_service.default.location
-  name     = google_cloud_run_v2_service.default.name
-  role     = "roles/run.invoker"
-  members = [
-    "allUsers"
-  ]
-}
+# Note: Allow unauthenticated access will be set via Cloud Build deployment
 
 data "google_client_config" "default" {}
