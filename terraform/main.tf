@@ -5,6 +5,10 @@ terraform {
       source  = "hashicorp/google"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.1"
+    }
   }
 }
 
@@ -13,9 +17,14 @@ provider "google" {
   region  = var.region
 }
 
+# Random suffix for unique bucket name
+resource "random_id" "bucket_suffix" {
+  byte_length = 4
+}
+
 # GCS bucket for Terraform state
 resource "google_storage_bucket" "terraform_state" {
-  name          = "${var.project_id}-terraform-state"
+  name          = "${var.project_id}-tf-state-${random_id.bucket_suffix.hex}"
   location      = var.region
   force_destroy = true
 
