@@ -5,5 +5,5 @@ output "service_url" {
 
 output "terraform_state_bucket" {
   description = "Terraform state bucket name"
-  value       = google_storage_bucket.terraform_state.name
+  value       = "${var.project_id}-maf-policy-bot-terraform-state"
 }

@@ -14,30 +14,7 @@ provider "google" {
 }
 
 # Use fixed names for consistent deployment
-
-# GCS bucket for Terraform state
-resource "google_storage_bucket" "terraform_state" {
-  name          = "${var.project_id}-maf-policy-bot-terraform-state"
-  location      = var.region
-  force_destroy = true
-  
-  lifecycle {
-    prevent_destroy = true
-  }
-
-  versioning {
-    enabled = true
-  }
-
-  lifecycle_rule {
-    condition {
-      num_newer_versions = 3
-    }
-    action {
-      type = "Delete"
-    }
-  }
-}
+# Note: GCS bucket exists and is managed externally
 
 # Note: Artifact Registry repository created manually
 # gcloud artifacts repositories create maf-policy-bot --repository-format=docker --location=us-central1
