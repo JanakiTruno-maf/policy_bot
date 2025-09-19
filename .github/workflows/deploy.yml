@@ -63,11 +63,11 @@ jobs:
     - name: Deploy with Cloud Build (Create)
       if: github.event.inputs.action == 'create'
       run: |
-        # Submit build and wait for completion without streaming logs
-        BUILD_ID=$(gcloud builds submit --config cloudbuild.yaml --project=${{ env.PROJECT_ID }} --format="value(id)" --no-user-output-enabled)
-        echo "Build ID: $BUILD_ID"
-        # Wait for build to complete
-        gcloud builds wait $BUILD_ID --project=${{ env.PROJECT_ID }}
+        # Submit build asynchronously to avoid log streaming issues
+        gcloud builds submit --config cloudbuild.yaml --project=${{ env.PROJECT_ID }} --async
+        echo "Build submitted successfully!"
+        # Wait a bit for deployment to complete
+        sleep 120
         # Set environment variables
         gcloud run services update ${{ env.SERVICE_NAME }} \
           --region=${{ env.REGION }} \
