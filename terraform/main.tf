@@ -20,6 +20,10 @@ resource "google_storage_bucket" "terraform_state" {
   name          = "${var.project_id}-maf-policy-bot-terraform-state"
   location      = var.region
   force_destroy = true
+  
+  lifecycle {
+    prevent_destroy = true
+  }
 
   versioning {
     enabled = true
