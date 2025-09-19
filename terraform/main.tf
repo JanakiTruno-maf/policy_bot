@@ -52,7 +52,7 @@ resource "google_cloud_run_v2_service" "default" {
 
   template {
     containers {
-      image = "gcr.io/cloudrun/hello"
+      image = "us-central1-docker.pkg.dev/${var.project_id}/maf-policy-bot/app:latest"
       
       ports {
         container_port = 8080
