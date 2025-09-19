@@ -50,9 +50,9 @@ jobs:
         echo '    prefix = "terraform/state"' >> backend_override.tf
         echo '  }' >> backend_override.tf
         echo '}' >> backend_override.tf
-        terraform init
-        # Clear any lock files
-        rm -f .terraform.lock.hcl || true
+        # Clean slate initialization
+        rm -rf .terraform .terraform.lock.hcl || true
+        terraform init -upgrade -reconfigure
       working-directory: ./terraform
 
     - name: Terraform Plan (Create)
