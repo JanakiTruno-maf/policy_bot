@@ -42,57 +42,57 @@ resource "google_storage_bucket" "terraform_state" {
   }
 }
 
-# Use Cloud Build to build and deploy
-resource "google_cloudbuild_trigger" "deploy_trigger" {
-  name        = "${var.service_name}-deploy"
-  description = "Deploy ${var.service_name} to Cloud Run"
+# Simple Cloud Run service deployment
+resource "google_cloud_run_v2_service" "default" {
+  name     = var.service_name
+  location = var.region
 
-  github {
-    owner = "JanakiTruno-maf"
-    name  = "policy_bot"
-    push {
-      branch = "main"
-    }
-  }
+  template {
+    containers {
+      image = "gcr.io/cloudrun/hello"
+      
+      ports {
+        container_port = 8080
+      }
 
-  build {
-    step {
-      name = "gcr.io/cloud-builders/docker"
-      args = [
-        "build",
-        "-t",
-        "gcr.io/${var.project_id}/${var.service_name}:latest",
-        "."
-      ]
+      env {
+        name  = "GOOGLE_CLOUD_PROJECT"
+        value = var.project_id
+      }
+
+      env {
+        name  = "VERTEX_LOCATION"
+        value = var.region
+      }
+
+      env {
+        name  = "RAG_CORPUS_RESOURCE"
+        value = var.rag_corpus_resource
+      }
+
+      resources {
+        limits = {
+          cpu    = "1"
+          memory = "2Gi"
+        }
+      }
     }
-    
-    step {
-      name = "gcr.io/cloud-builders/docker"
-      args = [
-        "push",
-        "gcr.io/${var.project_id}/${var.service_name}:latest"
-      ]
-    }
-    
-    step {
-      name = "gcr.io/cloud-builders/gcloud"
-      args = [
-        "run",
-        "deploy",
-        var.service_name,
-        "--image=gcr.io/${var.project_id}/${var.service_name}:latest",
-        "--region=${var.region}",
-        "--allow-unauthenticated",
-        "--set-env-vars=GOOGLE_CLOUD_PROJECT=${var.project_id},VERTEX_LOCATION=${var.region},RAG_CORPUS_RESOURCE=${var.rag_corpus_resource}"
-      ]
+
+    scaling {
+      min_instance_count = 0
+      max_instance_count = 10
     }
   }
 }
 
-# Cloud Run service will be created by Cloud Build
-# Just output the expected service URL
-locals {
-  service_url = "https://${var.service_name}-${random_id.bucket_suffix.hex}-${data.google_client_config.default.region}-${data.google_client_config.default.project}.a.run.app"
+# Allow unauthenticated access
+resource "google_cloud_run_v2_service_iam_binding" "default" {
+  location = google_cloud_run_v2_service.default.location
+  name     = google_cloud_run_v2_service.default.name
+  role     = "roles/run.invoker"
+  members = [
+    "allUsers"
+  ]
 }
 
 data "google_client_config" "default" {}

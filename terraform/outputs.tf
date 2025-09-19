@@ -1,9 +1,9 @@
 output "service_url" {
-  description = "Expected URL of the Cloud Run service"
-  value       = local.service_url
+  description = "URL of the Cloud Run service"
+  value       = google_cloud_run_v2_service.default.uri
 }
 
-output "build_trigger_id" {
-  description = "Cloud Build trigger ID"
-  value       = google_cloudbuild_trigger.deploy_trigger.id
+output "terraform_state_bucket" {
+  description = "Terraform state bucket name"
+  value       = google_storage_bucket.terraform_state.name
 }
