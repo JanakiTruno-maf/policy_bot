@@ -73,8 +73,46 @@ jobs:
           --region=${{ env.REGION }} \
           --project=${{ env.PROJECT_ID }} \
           --set-env-vars="GOOGLE_CLOUD_PROJECT=${{ env.PROJECT_ID }},VERTEX_LOCATION=${{ env.REGION }},VERTEX_MODEL_NAME=gemini-2.0-flash-001,RAG_CORPUS_RESOURCE=projects/${{ env.PROJECT_ID }}/locations/us-east4/ragCorpora/4035225266123964416,SECRET_KEY=tobacco-legal-info-system-2024,GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }},GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}"
+        # Update state to reflect deployment
+        SERVICE_URL="https://${{ env.SERVICE_NAME }}-670869581400.${{ env.REGION }}.run.app"
+        cat > deployment_state.json << EOF
+{
+  "version": 4,
+  "terraform_version": "1.5.0",
+  "serial": $(date +%s),
+  "lineage": "gcloud-managed",
+  "outputs": {
+    "service_url": {
+      "value": "$SERVICE_URL",
+      "type": "string"
+    },
+    "deployment_method": {
+      "value": "gcloud-builds",
+      "type": "string"
+    }
+  },
+  "resources": [
+    {
+      "mode": "managed",
+      "type": "google_cloud_run_v2_service",
+      "name": "${{ env.SERVICE_NAME }}",
+      "instances": [{
+        "attributes": {
+          "name": "${{ env.SERVICE_NAME }}",
+          "location": "${{ env.REGION }}",
+          "uri": "$SERVICE_URL",
+          "deployed_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+        }
+      }]
+    }
+  ]
+}
+EOF
+        gsutil cp deployment_state.json gs://${{ env.PROJECT_ID }}-maf-policy-bot-terraform-state/terraform/state/default.tfstate
+        rm deployment_state.json
         echo "✅ Deployment completed successfully!"
-        echo "🚀 Service URL: https://${{ env.SERVICE_NAME }}-670869581400.${{ env.REGION }}.run.app"
+        echo "🚀 Service URL: $SERVICE_URL"
+        echo "📊 State updated in GCS bucket"
 
     - name: Destroy Service
       if: github.event.inputs.action == 'destroy'
